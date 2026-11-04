@@ -44,14 +44,14 @@ Para rodar este bot, você precisará ter o Node.js instalado no seu computador.
 
 Pronto! Quando a mensagem "Conexão aberta! O bot está pronto para receber mensagens." aparecer, o bot já estará operando.
 
-## Hospedagem contínua no Render
+## Hospedagem gratuita no Render
 
-O `render.yaml` configura um Background Worker Docker com disco persistente de 1 GB em `/var/data`. O bot grava nesse disco a sessão do WhatsApp e os lembretes criados no serviço. O horário usado para os lembretes é o de São Paulo.
+O `render.yaml` configura um Web Service Docker no plano Free. Após 15 minutos sem tráfego de entrada, o Render suspende o serviço. Abra a URL do serviço para acordá-lo. A sessão do WhatsApp e os lembretes ficam no disco temporário e são perdidos após suspensão, reinício ou novo deploy. O horário dos lembretes é o de São Paulo.
 
 1. Publique o código em um repositório privado, incluindo `Dockerfile`, `.dockerignore` e `render.yaml`. Mantenha `.env`, `auth_info_baileys/` e `lembretes.json` fora do repositório.
-2. No [painel do Render](https://dashboard.render.com/), escolha **New → Blueprint**, conecte o repositório e revise o custo antes de confirmar a criação.
-3. Em **Environment** do worker, configure `OPENAI_API_KEY` para habilitar `!criarskin` e adicione as demais variáveis do seu `.env` que você usa.
-4. Encerre o bot local. No primeiro deploy, abra **Logs** no worker e escaneie o QR Code pelo WhatsApp em **Aparelhos conectados → Conectar um aparelho**. Depois de aparecer **Conexão aberta!**, envie `!ping`. Reinicie o worker e repita o teste para conferir que a sessão foi preservada.
+2. No [painel do Render](https://dashboard.render.com/), escolha **New → Blueprint**, conecte o repositório e confira se o serviço aparece no plano **Free**.
+3. Em **Environment** do serviço, configure `OPENAI_API_KEY` para habilitar `!criarskin` e adicione as demais variáveis do seu `.env` que você usa.
+4. Encerre o bot local. Abra **Logs** no serviço e escaneie o QR Code pelo WhatsApp em **Aparelhos conectados → Conectar um aparelho**. Depois de aparecer **Conexão aberta!**, envie `!ping`.
 
 ## Como Usar o Bot
 Você pode testar o bot enviando mensagens do seu próprio número (ou de outro, mas é recomendável testar de outro para garantir a fluidez).
