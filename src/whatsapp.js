@@ -4,9 +4,21 @@ const qrcode = require('qrcode-terminal');
 const config = require('./config');
 const { handleCommand, handleStickerCreation } = require('./commands');
 const { setReminderSocket } = require('./reminders');
+const { useRedisAuthState } = require('./redisAuth');
 
 async function connectToWhatsApp() {
-    const { state, saveCreds } = await useMultiFileAuthState(config.sessionPath);
+    const {
+        UPSTASH_REDIS_REST_URL: redisUrl,
+        UPSTASH_REDIS_REST_TOKEN: redisToken,
+        WA_SESSION_KEY: sessionKey
+    } = process.env;
+    const useRedis = redisUrl || redisToken || sessionKey;
+    if (useRedis && !(redisUrl && redisToken && sessionKey)) {
+        throw new Error('Configure UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN e WA_SESSION_KEY juntos.');
+    }
+    const { state, saveCreds } = useRedis
+        ? await useRedisAuthState(redisUrl, redisToken, sessionKey)
+        : await useMultiFileAuthState(config.sessionPath);
 
     const sock = makeWASocket({
         auth: state,
@@ -39,7 +51,12 @@ async function connectToWhatsApp() {
     };
 
     // Salva as credenciais sempre que forem atualizadas
-    sock.ev.on('creds.update', saveCreds);
+    sock.ev.on('creds.update', () => {
+        saveCreds().catch(err => {
+            console.error('Erro ao salvar a sessão do WhatsApp:', err.message);
+            process.exit(1);
+        });
+    });
 
     sock.ev.on('connection.update', (update) => {
         const { connection, lastDisconnect, qr } = update;

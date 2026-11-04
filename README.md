@@ -46,12 +46,18 @@ Pronto! Quando a mensagem "Conexão aberta! O bot está pronto para receber mens
 
 ## Hospedagem gratuita no Render
 
-O `render.yaml` configura um Web Service Docker no plano Free. Após 15 minutos sem tráfego de entrada, o Render suspende o serviço. Abra a URL do serviço para acordá-lo. A sessão do WhatsApp e os lembretes ficam no disco temporário e são perdidos após suspensão, reinício ou novo deploy. O horário dos lembretes é o de São Paulo.
+O `render.yaml` configura um Web Service Docker no plano Free. Após 15 minutos sem tráfego de entrada, o Render suspende o serviço. Abra o endereço público do serviço com `/health` no final para acordá-lo. Os lembretes ficam no disco temporário. O horário dos lembretes é o de São Paulo.
 
 1. Publique o código em um repositório privado, incluindo `Dockerfile`, `.dockerignore` e `render.yaml`. Mantenha `.env`, `auth_info_baileys/` e `lembretes.json` fora do repositório.
 2. No [painel do Render](https://dashboard.render.com/), escolha **New → Blueprint**, conecte o repositório e confira se o serviço aparece no plano **Free**.
 3. Em **Environment** do serviço, configure `OPENAI_API_KEY` para habilitar `!criarskin` e adicione as demais variáveis do seu `.env` que você usa.
 4. Encerre o bot local. Abra **Logs** no serviço e escaneie o QR Code pelo WhatsApp em **Aparelhos conectados → Conectar um aparelho**. Depois de aparecer **Conexão aberta!**, envie `!ping`.
+
+### Reconectar sem escanear o QR Code a cada suspensão
+
+1. Crie um banco Redis no plano Free do Upstash para este bot. Na aba **REST**, copie a URL e o token com permissão de escrita.
+2. Em **Environment** no Render, adicione `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` e `WA_SESSION_KEY`. Gere a última no terminal com `node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"`. Guarde a chave para que o bot consiga ler a sessão após reinícios.
+3. Após o deploy com essas variáveis, escaneie o QR Code uma vez. A sessão será armazenada criptografada no Redis. Para acordar o serviço depois, abra o endereço público com `/health` e aguarde a reconexão antes de enviar `!ping`.
 
 ## Como Usar o Bot
 Você pode testar o bot enviando mensagens do seu próprio número (ou de outro, mas é recomendável testar de outro para garantir a fluidez).
