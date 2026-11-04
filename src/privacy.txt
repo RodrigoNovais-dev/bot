@@ -1,0 +1,10 @@
+Política de privacidade do Bot de Figurinhas
+Atualizada em 4 de novembro de 2026
+
+Quando você interage com o bot pelo WhatsApp, ele recebe o identificador da mensagem, o número ou identificador do remetente e, quando disponível, o nome do perfil. Ele usa o texto, a mídia ou o link enviado para executar o comando e responder à conversa.
+
+O WhatsApp transporta as mensagens, e o Render hospeda o bot. Os dados usados para responder a um comando dependem da função escolhida. Consultas de CEP, clima e cotação enviam os termos necessários aos serviços consultados. Comandos de voz ou de inteligência artificial podem enviar o texto ou a imagem da solicitação ao fornecedor usado pela função. Comandos de download enviam a busca ou o link aos serviços de mídia usados para localizar o conteúdo.
+
+Os lembretes guardam a mensagem, o horário e os identificadores necessários para entregá-los. Você pode usar !lembretes para listar os lembretes da conversa e !dellembrete <ID> para cancelar um lembrete pendente. No Render Free, os lembretes salvos no disco temporário podem ser perdidos quando o serviço para ou reinicia. Alguns comandos usam arquivos temporários durante o processamento. A Meta e os outros fornecedores tratam dados de acordo com suas próprias políticas.
+
+Para tirar dúvidas sobre os dados ou solicitar acesso, correção ou exclusão, fale com a pessoa que disponibilizou o bot para você. Se você usa o bot em um grupo, pode pedir ao administrador do grupo que indique o responsável pelo bot.

@@ -6,7 +6,14 @@ const cloudWebhook = process.env.WA_CLOUD_ENABLED === '1' ? createCloudWebhook(p
 
 if (process.env.PORT || cloudWebhook) {
     const { createServer } = require('node:http');
+    const { readFileSync } = require('node:fs');
+    const privacyPolicy = readFileSync(path.join(__dirname, 'privacy.txt'));
     createServer((req, res) => {
+        if ((req.method === 'GET' || req.method === 'HEAD') && req.url?.split('?')[0] === '/privacidade') {
+            res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+            res.end(req.method === 'HEAD' ? undefined : privacyPolicy);
+            return;
+        }
         if (cloudWebhook && req.url?.split('?')[0] === '/webhook/whatsapp') {
             cloudWebhook(req, res).catch(err => {
                 console.error('Falha no webhook do WhatsApp:', err.message);
