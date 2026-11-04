@@ -1,0 +1,14 @@
+services:
+  - type: worker
+    name: whatsapp-sticker-bot
+    runtime: docker
+    plan: 0.5c-512mb
+    disk:
+      name: whatsapp-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: BOT_DATA_DIR
+        value: /var/data
+      - key: TZ
+        value: America/Sao_Paulo

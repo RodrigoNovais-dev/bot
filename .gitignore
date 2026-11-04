@@ -1,0 +1,16 @@
+node_modules/
+.env
+.env.*
+!.env.example
+auth_info_baileys/
+lembretes.json
+lembretes.json.tmp
+tmp/
+output/
+temp-*
+temp_*
+*.log
+.DS_Store
+/test-*.mp3
+/test-*.m4a
+/test-*.webm
