@@ -512,7 +512,9 @@ async function handleStickerCreation(sock, msg, from, mediaContainer, isReply = 
         }
 
         // Baixa o conteúdo da mensagem
-        const stream = await downloadContentFromMessage(mediaMsg, downloadType);
+        const stream = sock.downloadMedia
+            ? await sock.downloadMedia(mediaMsg)
+            : await downloadContentFromMessage(mediaMsg, downloadType);
         let buffer = Buffer.from([]);
         for await (const chunk of stream) {
             buffer = Buffer.concat([buffer, chunk]);

@@ -59,6 +59,16 @@ O `render.yaml` configura um Web Service Docker no plano Free. Após 15 minutos 
 2. Em **Environment** no Render, adicione `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` e `WA_SESSION_KEY`. Gere a última no terminal com `node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"`. Guarde a chave para que o bot consiga ler a sessão após reinícios.
 3. Após o deploy com essas variáveis, escaneie o QR Code uma vez. A sessão será armazenada criptografada no Redis. Para acordar o serviço depois, abra o endereço público com `/health` e aguarde a reconexão antes de enviar `!ping`.
 
+### Acordar o Render com uma mensagem no WhatsApp
+
+Para receber mensagens por webhook, cadastre um número na WhatsApp Cloud API da Meta. Use o número de teste da Meta para validar o fluxo antes de cadastrar o número definitivo.
+
+1. Em **Environment** no Render, adicione `WA_CLOUD_ENABLED=1`, `WA_PHONE_NUMBER_ID`, `WA_ACCESS_TOKEN`, `WA_APP_SECRET`, `WA_GRAPH_VERSION` (por exemplo, a versão exibida no painel da Meta) e `WA_VERIFY_TOKEN` (um segredo aleatório que você gera e reutiliza na próxima etapa). Salve para iniciar o deploy.
+2. Na configuração de webhooks da Meta, informe a URL pública do Render com `/webhook/whatsapp` no final e o mesmo `WA_VERIFY_TOKEN`. Assine o campo **messages** e confira se o aplicativo está inscrito na conta do WhatsApp Business.
+3. Envie `!ping` em uma conversa privada para o número cadastrado. A Meta envia a mensagem ao Render e o serviço pode levar cerca de um minuto para sair da suspensão.
+
+Nesse modo, o bot usa a Cloud API e dispensa QR Code. Envie a mídia diretamente para criar uma figurinha. Os grupos atuais e as respostas a mídias antigas dependem do modo Baileys. Para voltar a ele, remova `WA_CLOUD_ENABLED`.
+
 ## Como Usar o Bot
 Você pode testar o bot enviando mensagens do seu próprio número (ou de outro, mas é recomendável testar de outro para garantir a fluidez).
 

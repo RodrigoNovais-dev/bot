@@ -1,14 +1,23 @@
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '..', '.env') });
 const { connectToWhatsApp } = require('./whatsapp');
+const { createCloudWebhook } = require('./cloudWebhook');
+const cloudWebhook = process.env.WA_CLOUD_ENABLED === '1' ? createCloudWebhook(process.env) : null;
 
-if (process.env.PORT) {
+if (process.env.PORT || cloudWebhook) {
     const { createServer } = require('node:http');
     createServer((req, res) => {
+        if (cloudWebhook && req.url?.split('?')[0] === '/webhook/whatsapp') {
+            cloudWebhook(req, res).catch(err => {
+                console.error('Falha no webhook do WhatsApp:', err.message);
+                if (!res.writableEnded) res.writeHead(500).end();
+            });
+            return;
+        }
         const isHealthCheck = req.url === '/health';
         res.writeHead(isHealthCheck ? 200 : 404, { 'Content-Type': 'text/plain' });
         res.end(isHealthCheck ? 'OK' : 'Not found');
-    }).listen(Number(process.env.PORT), '0.0.0.0');
+    }).listen(Number(process.env.PORT || 3000), '0.0.0.0');
 }
 
 // Suprime logs internos informativos da libsignal que poluem o terminal
@@ -42,7 +51,9 @@ process.on('uncaughtException', (err) => {
 });
 
 console.log('Iniciando o Bot de Figurinhas...');
-connectToWhatsApp().catch(err => {
-    console.error('Erro inesperado na conexão:', err);
-    process.exit(1);
-});
+if (!cloudWebhook) {
+    connectToWhatsApp().catch(err => {
+        console.error('Erro inesperado na conexão:', err);
+        process.exit(1);
+    });
+}
