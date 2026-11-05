@@ -7,10 +7,26 @@ const cloudWebhook = process.env.WA_CLOUD_ENABLED === '1' ? createCloudWebhook(p
 if (process.env.PORT || cloudWebhook) {
     const { createServer } = require('node:http');
     const { readFileSync } = require('node:fs');
-    const privacyPolicy = readFileSync(path.join(__dirname, 'privacy.txt'));
+    const policyText = readFileSync(path.join(__dirname, 'privacy.txt'), 'utf8');
+    const [policyTitle, ...policyParagraphs] = policyText.trim().split(/\r?\n(?:\r?\n)*/);
+    const escapeHtml = text => text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+    const privacyPolicy = `<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>${escapeHtml(policyTitle)}</title>
+</head>
+<body>
+    <main>
+        <h1>${escapeHtml(policyTitle)}</h1>
+        ${policyParagraphs.map(paragraph => `<p>${escapeHtml(paragraph)}</p>`).join('\n        ')}
+    </main>
+</body>
+</html>`;
     createServer((req, res) => {
         if ((req.method === 'GET' || req.method === 'HEAD') && req.url?.split('?')[0] === '/privacidade') {
-            res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+            res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
             res.end(req.method === 'HEAD' ? undefined : privacyPolicy);
             return;
         }
